@@ -1,0 +1,28 @@
+[versions]
+slf4j = "2.0.17"
+log4j = "2.24.3"
+
+annotations = "26.0.2"
+lombok = "1.18.38"
+
+jda = "5.5.1"
+
+[libraries]
+# Logging
+slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
+log4j-sl4j-impl = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
+
+# Code quality
+annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
+
+# JDA
+jda = { group = "net.dv8tion", name = "JDA" , version.ref = "jda" }
+
+# Twitch
+
+[bundles]
+logging = ["slf4j", "log4j-api", "log4j-core", "log4j-sl4j-impl"]
+utils = ["annotations", "lombok"]
