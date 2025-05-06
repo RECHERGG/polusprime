@@ -45,3 +45,5 @@ bin/
 /logs/application.log
 /logs/error.log
 /.idea/vcs.xml
+
+.env
