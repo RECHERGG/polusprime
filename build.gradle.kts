@@ -14,5 +14,8 @@ dependencies {
 
     implementation(libs.bundles.logging)
     implementation(libs.bundles.utils)
+    implementation(libs.twitch4j)
     implementation(libs.jda)
+
+    implementation("io.github.cdimascio:dotenv-java:3.2.0") // TODO ony for testing purpose
 }

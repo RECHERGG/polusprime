@@ -7,6 +7,8 @@ lombok = "1.18.38"
 
 jda = "5.5.1"
 
+twitch4j = "1.24.0"
+
 [libraries]
 # Logging
 slf4j = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
@@ -22,6 +24,7 @@ lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" 
 jda = { group = "net.dv8tion", name = "JDA" , version.ref = "jda" }
 
 # Twitch
+twitch4j = { group = "com.github.twitch4j", name = "twitch4j", version.ref = "twitch4j" }
 
 [bundles]
 logging = ["slf4j", "log4j-api", "log4j-core", "log4j-sl4j-impl"]
