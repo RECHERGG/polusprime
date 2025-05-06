@@ -41,5 +41,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-./.idea
-./logs
+/.idea/.gitignore
+/logs/application.log
+/logs/error.log
+/.idea/vcs.xml
