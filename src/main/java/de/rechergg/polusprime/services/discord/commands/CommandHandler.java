@@ -20,7 +20,5 @@ public class CommandHandler extends ListenerAdapter {
                 .filter(command -> command.data().getName().equalsIgnoreCase(event.getInteraction().getName()))
                 .findFirst()
                 .ifPresent(command -> command.handle(event));
-
-
     }
 }
