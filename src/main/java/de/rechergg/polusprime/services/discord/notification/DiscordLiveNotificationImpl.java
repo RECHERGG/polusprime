@@ -1,6 +1,8 @@
 package de.rechergg.polusprime.services.discord.notification;
 
+import de.rechergg.polusprime.PolusPrime;
 import de.rechergg.polusprime.services.discord.DiscordService;
+import de.rechergg.polusprime.services.twitch.StreamInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -10,50 +12,64 @@ import java.util.HashMap;
 
 public class DiscordLiveNotificationImpl implements DiscordLiveNotification {
 
-    private final DiscordService discordService;
+    private final PolusPrime polusPrime;
     private final TextChannel textChannel;
     private final HashMap<String, String> messageIdMap = new HashMap<>();
 
-    public DiscordLiveNotificationImpl(DiscordService discordService) {
-        this.discordService = discordService;
-        this.textChannel = this.discordService.bot().getGuildById("1077232612613034024").getTextChannelById("1363828207253455052");
+    public DiscordLiveNotificationImpl(PolusPrime polusPrime, DiscordService discordService) {
+        this.polusPrime = polusPrime;
+        this.textChannel = discordService.bot().getGuildById("1033676465314738196").getTextChannelById("1033687781072977940");
     }
 
     @Override
-    public void postLiveNotification(String titel, String channelName, String channelId, String channelProfileIcon, String uptime, String thumbnailUrl, String streamUrl, String gameName, Integer viewersCount) {
+    public void postLiveNotification(StreamInfo streamInfo) {
         this.textChannel.sendMessage("@everyone").addEmbeds(buildNotificationEmbed(
-                channelName + " ist live auf Twitch!",
-                channelProfileIcon,
-                titel,
-                "Online seit " + uptime + " | Zuletzt aktualisiert",
-                streamUrl,
-                thumbnailUrl,
-                "Game", gameName,
-                "Viewers", viewersCount.toString(),
+                streamInfo.channelName() + " ist live auf Twitch!",
+                streamInfo.channelProfileIcon(),
+                streamInfo.titel(),
+                "Online seit " + streamInfo.uptime() + " | Zuletzt aktualisiert",
+                streamInfo.streamUrl(),
+                streamInfo.thumbnailUrl(),
+                "🎮 Game", streamInfo.gameName(),
+                "👀 Viewers", streamInfo.viewersCount().toString(),
                 null,
                 null
-        )).queue(it -> this.messageIdMap.put(channelId, it.getId()));
+        )).queue(it -> this.messageIdMap.put(streamInfo.channelId(), it.getId()));
     }
 
     @Override
-    public void updateLiveNotification(String titel, String channelName, String channelId, String channelProfileIcon, String uptime, String thumbnailUrl, String streamUrl, String gameName, Integer viewersCount) {
-        this.textChannel.editMessageEmbedsById(this.messageIdMap.get(channelId), buildNotificationEmbed(
-                channelName + " ist live auf Twitch!",
-                channelProfileIcon,
-                titel,
-                "Online seit " + uptime + " | Zuletzt aktualisiert",
-                streamUrl,
-                thumbnailUrl,
-                "Game", gameName,
-                "Viewers", viewersCount.toString(),
+    public void updateLiveNotification(StreamInfo streamInfo) {
+        this.textChannel.editMessageEmbedsById(this.messageIdMap.get(streamInfo.channelId()), buildNotificationEmbed(
+                streamInfo.channelName() + " ist live auf Twitch!",
+                streamInfo.channelProfileIcon(),
+                streamInfo.titel(),
+                "Online seit " + streamInfo.uptime() + " | Zuletzt aktualisiert",
+                streamInfo.streamUrl(),
+                streamInfo.thumbnailUrl(),
+                "🎮 Game", streamInfo.gameName(),
+                "👀 Viewers", streamInfo.viewersCount().toString(),
                 null,
                 null
         )).queue();
     }
 
     @Override
-    public void updateLiveToVODNotification(String titel, String channelName, String thumbnailUrl, String streamUrl, String gameName, String gameUrl, String gameThumbnailUrl, String description, String messageId) {
+    public void updateLiveToVODNotification(StreamInfo streamInfo) {
+        var vod = this.polusPrime.twitchService().fetchVOD(streamInfo.channelId(), streamInfo.streamStartTime());
 
+        this.textChannel.editMessageEmbedsById(this.messageIdMap.get(streamInfo.channelId()), buildNotificationEmbed(
+                streamInfo.channelName() + " war live auf Twitch!",
+                streamInfo.channelProfileIcon(),
+                streamInfo.titel(),
+                "Online für " + streamInfo.uptime() + " | Offline gegangen",
+                streamInfo.streamUrl(),
+                null,
+                "🎮 Game", streamInfo.gameName(),
+                vod == null ? null : "📺 Verpasst? Wiederholung:",
+                vod == null ? null : "**[Klick](" + vod + ")**",
+                "Nächstes mal dabei?",
+                "Folge [hier](https://twitch.tv/" + streamInfo.channelName() + ")"
+        )).queue();
     }
 
     private MessageEmbed buildNotificationEmbed(String author, String channelProfileIcon, String titel, String footer, String streamUrl, String thumbnailUrl, String fieldOne, String fieldOneValue, String fieldTwo, String fieldTwoValue, String fieldThree, String fieldThreeValue) {
@@ -69,7 +85,10 @@ public class DiscordLiveNotificationImpl implements DiscordLiveNotification {
             builder.addField(fieldThree, fieldThreeValue, true);
         }
 
-        builder.setImage(thumbnailUrl);
+        if (thumbnailUrl != null) {
+            builder.setImage(thumbnailUrl);
+        }
+
         builder.setColor(0x9146FF);
 
         builder.setFooter(footer, "https://images.icon-icons.com/3041/PNG/512/twitch_logo_icon_189242.png");
