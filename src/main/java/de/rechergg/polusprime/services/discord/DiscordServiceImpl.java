@@ -4,6 +4,8 @@ import de.rechergg.polusprime.PolusPrime;
 import de.rechergg.polusprime.services.discord.commands.CommandHandler;
 import de.rechergg.polusprime.services.discord.commands.CommandManager;
 import de.rechergg.polusprime.services.discord.commands.CommandManagerImpl;
+import de.rechergg.polusprime.services.discord.notification.DiscordLiveNotification;
+import de.rechergg.polusprime.services.discord.notification.DiscordLiveNotificationImpl;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
 import net.dv8tion.jda.api.JDA;
@@ -14,6 +16,7 @@ public class DiscordServiceImpl implements DiscordService {
 
     private JDA bot;
     private CommandManager commandManager;
+    private DiscordLiveNotification liveNotification;
 
     public DiscordServiceImpl(PolusPrime polusPrime, Dotenv dotenv) {
         log.info("Initializing Discord service...");
@@ -43,6 +46,8 @@ public class DiscordServiceImpl implements DiscordService {
             log.error("Failed to initialize Discord service.", e);
             System.exit(-1);
         }
+
+        this.liveNotification = new DiscordLiveNotificationImpl(this);
     }
 
     @Override
@@ -58,5 +63,10 @@ public class DiscordServiceImpl implements DiscordService {
     @Override
     public CommandManager commandManager() {
         return this.commandManager;
+    }
+
+    @Override
+    public DiscordLiveNotification liveNotification() {
+        return this.liveNotification;
     }
 }
