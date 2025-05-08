@@ -2,6 +2,7 @@ package de.rechergg.polusprime;
 
 import de.rechergg.polusprime.services.discord.DiscordService;
 import de.rechergg.polusprime.services.discord.DiscordServiceImpl;
+import de.rechergg.polusprime.services.twitch.ChannelLiveListener;
 import de.rechergg.polusprime.services.twitch.TwitchService;
 import de.rechergg.polusprime.services.twitch.TwitchServiceImpl;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -22,8 +23,10 @@ public class PolusPrime {
 
         var dotenv = Dotenv.load();
 
-        this.twitchService = new TwitchServiceImpl(dotenv);
+        this.twitchService = new TwitchServiceImpl(this, dotenv);
         this.discordService = new DiscordServiceImpl(this, dotenv);
+
+        new ChannelLiveListener(this);
 
         log.info("PolusPrime started successfully.");
     }
