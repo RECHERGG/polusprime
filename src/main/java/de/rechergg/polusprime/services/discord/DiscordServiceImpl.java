@@ -47,7 +47,7 @@ public class DiscordServiceImpl implements DiscordService {
             System.exit(-1);
         }
 
-        this.liveNotification = new DiscordLiveNotificationImpl(this);
+        this.liveNotification = new DiscordLiveNotificationImpl(polusPrime, this);
     }
 
     @Override
