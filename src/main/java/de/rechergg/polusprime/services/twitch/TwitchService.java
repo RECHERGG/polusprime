@@ -5,6 +5,7 @@ import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.helix.domain.User;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -55,4 +56,11 @@ public interface TwitchService {
      * @param channelName the channel name to stop monitoring
      */
     void stopMonitoring(String channelName);
+
+    /**
+     * Fetch the current stream for a given channel ID
+     * @param channelId the channel ID to fetch the stream for
+     * @return the current stream object
+     */
+    String fetchVOD(String channelId, Instant streamStartTime);
 }
