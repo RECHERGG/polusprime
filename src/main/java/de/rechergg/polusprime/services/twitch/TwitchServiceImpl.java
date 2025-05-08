@@ -6,10 +6,13 @@ import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.helix.domain.User;
+import com.github.twitch4j.helix.domain.Video;
 import de.rechergg.polusprime.PolusPrime;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.log4j.Log4j2;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -132,5 +135,26 @@ public class TwitchServiceImpl implements TwitchService {
         this.client.getClientHelper().disableStreamEventListener(channelName);
         this.channelIdMap.remove(channelName);
         log.info("Stopped monitoring channel: {}", channelName);
+    }
+
+    @Override
+    public String fetchVOD(String channelId, Instant streamStartTime) {
+        var videos = client().getHelix()
+                .getVideos(null, null, channelId, null, null, null, null, Video.Type.ARCHIVE, 5, null, null)
+                .execute()
+                .getVideos();
+
+        if (videos.isEmpty()) return null;
+
+        for (var video : videos) {
+            if (!"archive".equals(video.getType())) continue;
+
+            var vodCreated = video.getCreatedAtInstant();
+            long minutesDiff = Math.abs(Duration.between(streamStartTime, vodCreated).toMinutes());
+
+            if (minutesDiff <= 10) return video.getUrl();
+        }
+
+        return null;
     }
 }
